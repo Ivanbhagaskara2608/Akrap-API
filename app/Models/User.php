@@ -47,4 +47,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'birthdate' => 'datetime:d/m/Y'
     ];
+
+    protected $primaryKey = "userId";
 }
