@@ -21,7 +21,7 @@ Route::post('login', '\App\Http\Controllers\UserController@login');
 
 // secretary
 Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(function() {
-    
+    Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
 });
 
 // treasurer
@@ -29,6 +29,5 @@ Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(funct
 // all users authenticated
 Route::middleware(['auth:api'])->group(function() {
     Route::get('schedule', '\App\Http\Controllers\ScheduleController@show');
-    Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
     Route::post('logout', '\App\Http\Controllers\UserController@logout');
 });
