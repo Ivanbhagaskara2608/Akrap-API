@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            // for authenticate token (avoid the unauthenticated problem)
+            'driver' => 'token',
+            'provider' => 'users',
+        ]
     ],
 
     /*

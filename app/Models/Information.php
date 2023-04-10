@@ -13,4 +13,6 @@ class Information extends Model
         'title',
         'content'
     ];
+
+    protected $primaryKey = "informationId";
 }

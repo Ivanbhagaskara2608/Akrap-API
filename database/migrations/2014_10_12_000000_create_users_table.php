@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('birthdate');
             $table->enum('gender', ['male', 'female']);
             $table->string('username', 16)->unique();
-            $table->enum('job', ['ketua', 'wakil ketua', 'sekretaris', 'bendahara', 'anggota']);
+            $table->enum('job', ['chairman', 'vice chairman', 'secretary', 'treasurer', 'member']);
             $table->string('password');
             $table->string('api_token')->unique()->nullable()->default(null);
             $table->rememberToken();

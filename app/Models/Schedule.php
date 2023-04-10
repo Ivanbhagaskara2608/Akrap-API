@@ -17,4 +17,12 @@ class Schedule extends Model
         'start_time',
         'end_time'
     ];
+
+    protected $casts = [
+        'date' => 'date:d/m/Y',
+        'start_time' => 'string:H:i',
+        'end_time' => 'string:H:i'
+    ];
+
+    protected $primaryKey = "scheduleId";
 }

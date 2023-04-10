@@ -45,7 +45,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'birthdate' => 'datetime:d/m/Y'
+        'birthdate' => 'date:d/m/Y'
     ];
 
     protected $primaryKey = "userId";

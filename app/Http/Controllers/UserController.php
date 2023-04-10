@@ -81,4 +81,19 @@ class UserController extends Controller
             "data" => []
         ], 401);
     }
+
+    public function logout(Request $request)
+    {
+        // clear api_token 
+        $request->user()->forceFill([
+            'api_token' => null
+        ])->save();
+        
+        // return result
+        return response()->json([
+            'message'=>'Logout successful',
+            "token" => null 
+        ]);
+    }
+
 }

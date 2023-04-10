@@ -13,8 +13,22 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 Route::post('register', '\App\Http\Controllers\UserController@register');
 Route::post('login', '\App\Http\Controllers\UserController@login');
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+// secretary
+Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(function() {
+    
+});
+
+// treasurer
+
+// all users authenticated
+Route::middleware(['auth:api'])->group(function() {
+    Route::get('schedule', '\App\Http\Controllers\ScheduleController@show');
+    Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
+    Route::post('logout', '\App\Http\Controllers\UserController@logout');
 });
