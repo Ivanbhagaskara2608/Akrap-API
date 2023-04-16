@@ -15,9 +15,9 @@ class ScheduleController extends Controller
      */
     public function index()
     {
-        // get and show all schedule data
-        $schedule = Schedule::all();
-        return response()->json([
+         // get and show all schedule data
+         $schedule = Schedule::all();
+         return response()->json([
             'data' => $schedule
         ], 200);
     }
@@ -66,9 +66,18 @@ class ScheduleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store($scheduleId)
     {
-        //
+        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
+
+        $schedule->status = '0';
+        $schedule->save();
+
+        // return response success
+        return response()->json([
+            'message'=> 'The Schedule is set to finished',
+            'data' => $schedule
+        ], 201);
     }
 
     /**
@@ -76,30 +85,69 @@ class ScheduleController extends Controller
      */
     public function show()
     {
-        
+        // get and show active schedule data
+        $schedule = Schedule::where('status', '1')->get();
+
+        if($schedule->isEmpty()) {
+            return response()->json([
+                "message" => "Schedule is empty",
+                "data" => []
+            ], 404);
+        } else {
+            return response()->json([
+                'data' => $schedule
+            ], 200);
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request)
     {
-        //
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $scheduleId)
     {
-        //
+        $request->validate([
+            'date' => 'required',
+            'location' => 'required|min:4|max:16',
+            'start_time' => 'required',
+            'end_time' => 'required'
+         ]);
+
+         // get data schedule from db
+        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
+        
+        $schedule->update([
+            'date' => $request['date'],
+            'location' => $request['location'],
+            'start_time' => $request['start_time'],
+            'end_time' => $request['end_time']
+        ]);
+
+        // return response success
+        return response()->json([
+            'message'=> 'Schedule has been successfully edit.',
+            'data' => $schedule
+        ], 201);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($scheduleId)
     {
-        //
+        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
+        
+        $schedule->forceDelete();
+
+        return response()->json([
+            'message'=> 'Schedule has been successfully deleted.',
+        ], 201);
     }
 }

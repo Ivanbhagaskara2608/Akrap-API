@@ -27,13 +27,14 @@ class PresenceController extends Controller
                 "message" => "History presences this user is empty",
                 "data" => []
             ], 404);
-        };
+        } else {
+            // return response success get data presences
+            return response()->json([
+                "message" => "History presences user found",
+                "data" => $presencesUser
+            ], 200);
+        }
 
-        // return response success get data presences
-        return response()->json([
-            "message" => "History presences user found",
-            "data" => $presencesUser
-        ], 200);
     }
 
     /**
@@ -109,17 +110,20 @@ class PresenceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store($scheduleId)
     {
-        $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
+        // get presences data 
+        $presences = Presence::where('scheduleId', $scheduleId)->get();
 
+        // check if there is data that has empty status, then set status to "Alpha"
         foreach ($presences as $presence) {
             if ($presence->status == '') {
                 $presence->status = 'Alpha';
                 $presence->save();
             }
         }
-
+        
+        // return response success
         return response()->json([
             'message'=> 'Attendance data has been successfully saved.',
             'data' => $presence
@@ -154,25 +158,26 @@ class PresenceController extends Controller
      */
     public function edit(Request $request)
     {
-        $presence = Presence::where('scheduleId', $request['scheduleId'])
-                            ->where('userId', $request['userId']) 
-                            ->first();
         
-        $presence->status = $request['status'];
-        $presence->save();
-
-        return response()->json([
-            'message'=> 'Attendance data has been successfully edit.',
-            'data' => $presence
-        ], 201);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $presenceId)
     {
-        //
+        // get data presence from db
+        $presence = Presence::where('scheduleId', $presenceId)->first();
+
+        // set the status and save
+        $presence->status = $request['status'];
+        $presence->save();
+ 
+        // return response success
+        return response()->json([
+            'message'=> 'Attendance data has been successfully edit.',
+            'data' => $presence
+        ], 201);
     }
 
     /**
