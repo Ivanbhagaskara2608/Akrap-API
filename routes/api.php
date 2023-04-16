@@ -22,12 +22,17 @@ Route::post('login', '\App\Http\Controllers\UserController@login');
 // secretary
 Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(function() {
     Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
+    Route::get('presence/show/{scheduleId}', '\App\Http\Controllers\PresenceController@show');
+    Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
+    Route::post('presence/edit', '\App\Http\Controllers\PresenceController@edit');
 });
 
 // treasurer
 
 // all users authenticated
 Route::middleware(['auth:api'])->group(function() {
-    Route::get('schedule', '\App\Http\Controllers\ScheduleController@show');
+    Route::get('schedule', '\App\Http\Controllers\ScheduleController@index');
     Route::post('logout', '\App\Http\Controllers\UserController@logout');
+    Route::get('presence/history', '\App\Http\Controllers\PresenceController@index');
+    Route::post('presence', '\App\Http\Controllers\PresenceController@presence');
 });

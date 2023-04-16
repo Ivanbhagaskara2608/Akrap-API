@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ class UserController extends Controller
         return response()->json([
             "message" => "User found",
             "data" => $request->user()
-          ]);
+          ], 200);
     }
 
     public function register(Request $request)
@@ -48,7 +49,7 @@ class UserController extends Controller
         return response()->json([
             "message" => "Registration succeeded",
             "data" => $data
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
@@ -93,7 +94,6 @@ class UserController extends Controller
         return response()->json([
             'message'=>'Logout successful',
             "token" => null 
-        ]);
+        ], 200);
     }
-
 }

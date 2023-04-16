@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedules', function (Blueprint $table) {
-            $table->id('scheduleId');
+        Schema::create('presences', function (Blueprint $table) {
+            $table->id('presenceId');
+            $table->unsignedBigInteger('scheduleId');
+            $table->foreign('scheduleId')->references('scheduleId')->on('schedules')->onDelete('cascade');
+            $table->unsignedBigInteger('userId');
+            $table->foreign('userId')->references('userId')->on('users')->onDelete('cascade');
             $table->string('activity_name');
             $table->date('date');
             $table->string('location', 16);
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->string('attendance_code');
-            $table->enum('status', [0, 1])->default(1);
+            $table->string('status', 5);
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedules');
+        Schema::dropIfExists('presences');
     }
 };

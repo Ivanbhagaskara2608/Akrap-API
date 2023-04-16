@@ -6,24 +6,33 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-class Schedule extends Model
+class Presence extends Model
 {
     use HasFactory, HasApiTokens;
 
     protected $fillable = [
+        'scheduleId',
+        'userId',
         'activity_name',
         'date',
         'location',
-        'start_time',
-        'end_time',
-        'attendance_code'
+        'status'
     ];
 
     protected $casts = [
         'date' => 'date:d/m/Y',
-        'start_time' => 'string:H:i',
-        'end_time' => 'string:H:i'
+        "created_at" => "datetime:d-m-Y H:i:s"
     ];
 
-    protected $primaryKey = "scheduleId";
+    protected $primaryKey = "presenceId";
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function schedules()
+    {
+        return $this->belongsTo(Schedule::class);
+    }
 }

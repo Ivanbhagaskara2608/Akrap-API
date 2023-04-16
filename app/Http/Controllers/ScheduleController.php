@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Blocktrail\CryptoJSAES\CryptoJSAES;
+
+
 class ScheduleController extends Controller
 {
     /**
@@ -12,7 +15,11 @@ class ScheduleController extends Controller
      */
     public function index()
     {
-        //
+        // get and show all schedule data
+        $schedule = Schedule::all();
+        return response()->json([
+            'data' => $schedule
+        ], 200);
     }
 
     /**
@@ -20,26 +27,40 @@ class ScheduleController extends Controller
      */
     public function create(Request $request)
     {
+        // validate the request from user
         $validation = $request->validate([
             'activity_name' => 'required',
             'date' => 'required',
             'location' => 'required|min:4|max:16',
             'start_time' => 'required',
-            'end_time' => 'required'
+            'end_time' => 'required',
+            'users' => 'required'
         ]);
 
+        // do encryption for attendance code
+        $text = $validation['activity_name'] . $validation['date'] . $validation['location'];
+        $key = 'akrap hor';
+        $attendanceCode = CryptoJSAES::encrypt($text, $key);
+        
+        // save schedule to database
         $data = Schedule::create([
             'activity_name' => $validation['activity_name'],
             'date' => $validation['date'],
             'location' => $validation['location'],
             'start_time' => $validation['start_time'],
-            'end_time' => $validation['end_time']
+            'end_time' => $validation['end_time'],
+            'attendance_code' => $attendanceCode
         ]);
 
+        
+        $createPresences = new PresenceController;
+        $createPresences->create($data['scheduleId'], $data['activity_name'], $data['date'], $data['location'], $validation['users']);
+
+        // return response success
         return response()->json([
             "message" => "Schedule added successfully",
             "data" => $data
-        ]);
+        ], 201);
     }
 
     /**
@@ -55,10 +76,7 @@ class ScheduleController extends Controller
      */
     public function show()
     {
-        $schedule = Schedule::all();
-        return response()->json([
-            'data' => $schedule
-        ]);
+        
     }
 
     /**

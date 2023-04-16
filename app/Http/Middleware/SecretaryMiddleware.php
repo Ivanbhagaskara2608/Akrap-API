@@ -16,7 +16,9 @@ class SecretaryMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        // check if authenticated user
         if(Auth::check()) {
+            // check if user job is secretary, then can request
             if(Auth::user()->job == 'secretary') {
                 return $next($request);
             } else {
