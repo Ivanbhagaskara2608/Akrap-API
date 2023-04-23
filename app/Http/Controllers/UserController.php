@@ -8,7 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
-{
+{   
+    public function test()
+    {
+        return response()->json([
+            "message" => "User found"
+          ], 200);
+    }
     public function index(Request $request)
     {
         // get all data from logged in user
@@ -26,7 +32,7 @@ class UserController extends Controller
             'phoneNumber' => 'required|digits_between:11,13|unique:users',
             'birthdate' => 'required|before:today',
             'gender' => 'required',
-            'username' => 'required|min:4|max:16|unique:users',
+            'username' => 'required|min:4|max:16|unique:users|without_spaces',
             'job' => 'required',
             'password' => 'required|min:8|max:32|confirmed'
         ]);
@@ -56,7 +62,7 @@ class UserController extends Controller
     {
         // validate the request
         $credentials = $request->validate([
-            'phoneNumber' => 'required|digits_between:11,13',
+            'username' => 'required|alpha_dash|min:4|max:16',
             'password' => 'required|min:8|max:32',
         ]);
 

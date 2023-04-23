@@ -30,7 +30,7 @@ class ScheduleController extends Controller
         // validate the request from user
         $validation = $request->validate([
             'activity_name' => 'required',
-            'date' => 'required',
+            'date' => 'required|after:yesterday',
             'location' => 'required|min:4|max:16',
             'start_time' => 'required',
             'end_time' => 'required',
@@ -66,18 +66,32 @@ class ScheduleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store($scheduleId)
+    public function store(Request $request)
     {
-        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
+        $request->validate([
+            'scheduleId' => 'required'
+        ]);
 
-        $schedule->status = '0';
-        $schedule->save();
+        $schedule = Schedule::where('scheduleId', $request['scheduleId'])->first();
 
-        // return response success
-        return response()->json([
-            'message'=> 'The Schedule is set to finished',
-            'data' => $schedule
-        ], 201);
+        if (!$schedule) {
+            return response()->json([
+                'message'=>'There is no schedule!'
+            ], 400);
+        } elseif ($schedule->status == '0') {
+            return response()->json([
+                'message'=>'The schedule is over!'
+            ], 400);
+        } else {
+            $schedule->status = '0';
+            $schedule->save();
+
+            // return response success
+            return response()->json([
+                'message'=> 'The Schedule is set to over',
+                'data' => $schedule
+            ], 201);   
+        }
     }
 
     /**
@@ -85,7 +99,7 @@ class ScheduleController extends Controller
      */
     public function show()
     {
-        // get and show active schedule data
+        // get and show recent schedule data
         $schedule = Schedule::where('status', '1')->get();
 
         if($schedule->isEmpty()) {
@@ -95,6 +109,25 @@ class ScheduleController extends Controller
             ], 404);
         } else {
             return response()->json([
+                "message" => "Recent schedules found",
+                'data' => $schedule
+            ], 200);
+        }
+    }
+
+    public function showPast()
+    {
+        // get and show past schedule data
+        $schedule = Schedule::where('status', '0')->get();
+
+        if($schedule->isEmpty()) {
+            return response()->json([
+                "message" => "Schedule is empty",
+                "data" => []
+            ], 404);
+        } else {
+            return response()->json([
+                "message" => "Past schedules found",
                 'data' => $schedule
             ], 200);
         }
@@ -111,43 +144,69 @@ class ScheduleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $scheduleId)
+    public function update(Request $request)
     {
         $request->validate([
-            'date' => 'required',
+            'scheduleId' => 'required',
+            'date' => 'required|after:yesterday',
             'location' => 'required|min:4|max:16',
             'start_time' => 'required',
             'end_time' => 'required'
          ]);
 
          // get data schedule from db
-        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
-        
-        $schedule->update([
-            'date' => $request['date'],
-            'location' => $request['location'],
-            'start_time' => $request['start_time'],
-            'end_time' => $request['end_time']
-        ]);
+        $schedule = Schedule::where('scheduleId', $request['scheduleId'])->first();
 
-        // return response success
-        return response()->json([
-            'message'=> 'Schedule has been successfully edit.',
-            'data' => $schedule
-        ], 201);
+        if (!$schedule) {
+            return response()->json([
+                'message'=>'There is no schedule!'
+            ], 400);
+        } elseif ($schedule->status == '0') {
+            return response()->json([
+                'message'=> 'You can not update the over schedule'
+            ], 400);
+        } else {
+            $text = $schedule['activity_name'] . $request['date'] . $request['location'];
+            $key = 'akrap hor';
+            $attendanceCode = CryptoJSAES::encrypt($text, $key);
+            
+            $schedule->update([
+                'date' => $request['date'],
+                'location' => $request['location'],
+                'start_time' => $request['start_time'],
+                'end_time' => $request['end_time'],
+                'attendance_code' => $attendanceCode
+            ]);
+
+            // return response success
+            return response()->json([
+                'message'=> 'Schedule has been successfully edit.',
+                'data' => $schedule
+            ], 201);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($scheduleId)
+    public function destroy(Request $request)
     {
-        $schedule = Schedule::where('scheduleId', $scheduleId)->first();
-        
-        $schedule->forceDelete();
+        $request->validate([
+            'scheduleId' => 'required'
+        ]);
 
-        return response()->json([
-            'message'=> 'Schedule has been successfully deleted.',
-        ], 201);
+        $schedule = Schedule::where('scheduleId', $request['scheduleId'])->first();
+        
+        if (!$schedule) {
+            return response()->json([
+                'message'=>'There is no schedule!'
+            ], 400);
+        } else {
+            $schedule->forceDelete();
+
+            return response()->json([
+                'message'=> 'Schedule has been successfully deleted.',
+            ], 201);
+        }
     }
 }

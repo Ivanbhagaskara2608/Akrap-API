@@ -18,24 +18,27 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::post('register', '\App\Http\Controllers\UserController@register');
 Route::post('login', '\App\Http\Controllers\UserController@login');
+Route::get('testing', '\App\Http\Controllers\UserController@test');
 
 // secretary
 Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(function() {
     Route::get('schedule/all', '\App\Http\Controllers\ScheduleController@index');
     Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
-    Route::post('schedule/store/{scheduleId}', '\App\Http\Controllers\ScheduleController@store');
-    Route::post('schedule/update/{scheduleId}', '\App\Http\Controllers\ScheduleController@update');
-    Route::post('schedule/delete/{scheduleId}', '\App\Http\Controllers\ScheduleController@destroy');
-    Route::get('presence/show/{scheduleId}', '\App\Http\Controllers\PresenceController@show');
+    Route::post('schedule/store', '\App\Http\Controllers\ScheduleController@store');
+    Route::post('schedule/update', '\App\Http\Controllers\ScheduleController@update');
+    Route::post('schedule/delete', '\App\Http\Controllers\ScheduleController@destroy');
+    Route::get('presence/show', '\App\Http\Controllers\PresenceController@show');
     Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
-    Route::post('presence/update/{presenceId}', '\App\Http\Controllers\PresenceController@update');
+    Route::post('presence/update', '\App\Http\Controllers\PresenceController@update');
 });
 
 // treasurer
 
 // all users authenticated
 Route::middleware(['auth:api'])->group(function() {
+    Route::get('user', '\App\Http\Controllers\UserController@index');
     Route::get('schedule', '\App\Http\Controllers\ScheduleController@show');
+    Route::get('schedule/past', '\App\Http\Controllers\ScheduleController@showPast');
     Route::post('logout', '\App\Http\Controllers\UserController@logout');
     Route::get('presence/history', '\App\Http\Controllers\PresenceController@index');
     Route::post('presence', '\App\Http\Controllers\PresenceController@presence');

@@ -56,7 +56,11 @@ class PresenceController extends Controller
             return response()->json([
                 'message'=>'invalid Attendance code!'
             ], 400);
-        } 
+        } elseif ($schedule->status == 0) {
+            return response()->json([
+                'message'=>'This schedule is over!'
+            ], 400);
+        }
         // get data presence 
         $presence = Presence::where('scheduleId', $schedule->scheduleId)
                             ->where('userId', $user->userId)
@@ -110,33 +114,46 @@ class PresenceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store($scheduleId)
+    public function store(Request $request)
     {
-        // get presences data 
-        $presences = Presence::where('scheduleId', $scheduleId)->get();
+        $request->validate([
+            'scheduleId' => 'required'
+        ]);
 
-        // check if there is data that has empty status, then set status to "Alpha"
-        foreach ($presences as $presence) {
-            if ($presence->status == '') {
-                $presence->status = 'Alpha';
-                $presence->save();
+        // get presences data 
+        $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
+
+        if ($presences->count() == 0) {
+            return response()->json([
+                'message'=>'There is no presences!'
+            ], 400);
+        } else {
+            // check if there is data that has empty status, then set status to "Alpha"
+            foreach ($presences as $presence) {
+                if (!$presence->status) {
+                    $presence->status = 'Alpha';
+                    $presence->save();
+                }
             }
+            // return response success
+            return response()->json([
+                'message'=> 'Attendance data has been successfully saved.',
+                'data' => $presences
+            ], 201);
         }
-        
-        // return response success
-        return response()->json([
-            'message'=> 'Attendance data has been successfully saved.',
-            'data' => $presence
-        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($scheduleId)
+    public function show(Request $request)
     {
+        $request->validate([
+            'scheduleId' => 'required'
+        ]);
+
         // get all presences data from database by scheduleId
-        $presences = Presence::where('scheduleId', $scheduleId)->get();
+        $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
 
         // return response if there's no record in database
         if ($presences->isEmpty()) {
@@ -164,10 +181,15 @@ class PresenceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $presenceId)
+    public function update(Request $request)
     {
+        $request->validate([
+            'presenceId' => 'required',
+            'status' => 'required'
+        ]);
+
         // get data presence from db
-        $presence = Presence::where('scheduleId', $presenceId)->first();
+        $presence = Presence::where('presenceId', $request['presenceId'])->first();
 
         // set the status and save
         $presence->status = $request['status'];
