@@ -32,8 +32,7 @@ class UserController extends Controller
             'phoneNumber' => 'required|digits_between:11,13|unique:users',
             'birthdate' => 'required|before:today',
             'gender' => 'required',
-            'username' => 'required|min:4|max:16|unique:users|without_spaces',
-            'job' => 'required',
+            'username' => 'required|min:4|max:16|unique:users|alpha_dash',
             'password' => 'required|min:8|max:32|confirmed'
         ]);
 
@@ -47,7 +46,6 @@ class UserController extends Controller
             'birthdate' => $validation['birthdate'],
             'gender' => $validation['gender'],
             'username' => $validation['username'],
-            'job' => $validation['job'],
             'password' => $validation['password']
         ]);
 
@@ -101,5 +99,12 @@ class UserController extends Controller
             'message'=>'Logout successful',
             "token" => null 
         ], 200);
+    }
+    public function getAllUsers() {
+        $users = User::all();
+
+        return response()->json([
+            "data" => $users
+          ], 200);
     }
 }

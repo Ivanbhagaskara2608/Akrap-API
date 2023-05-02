@@ -151,7 +151,7 @@ class ScheduleController extends Controller
             'date' => 'required|after:yesterday',
             'location' => 'required|min:4|max:16',
             'start_time' => 'required',
-            'end_time' => 'required'
+            'end_time' => 'required',
          ]);
 
          // get data schedule from db
@@ -163,7 +163,7 @@ class ScheduleController extends Controller
             ], 400);
         } elseif ($schedule->status == '0') {
             return response()->json([
-                'message'=> 'You can not update the over schedule'
+                'message'=> 'You can not update the past schedule'
             ], 400);
         } else {
             $text = $schedule['activity_name'] . $request['date'] . $request['location'];

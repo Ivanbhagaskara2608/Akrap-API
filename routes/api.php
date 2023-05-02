@@ -21,7 +21,7 @@ Route::post('login', '\App\Http\Controllers\UserController@login');
 Route::get('testing', '\App\Http\Controllers\UserController@test');
 
 // secretary
-Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(function() {
+Route::prefix('admin')->middleware(['auth:api', 'isAdmin'])->group(function() {
     Route::get('schedule/all', '\App\Http\Controllers\ScheduleController@index');
     Route::post('schedule/add', '\App\Http\Controllers\ScheduleController@create');
     Route::post('schedule/store', '\App\Http\Controllers\ScheduleController@store');
@@ -30,6 +30,7 @@ Route::prefix('secretary')->middleware(['auth:api', 'isSecretary'])->group(funct
     Route::get('presence/show', '\App\Http\Controllers\PresenceController@show');
     Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
     Route::post('presence/update', '\App\Http\Controllers\PresenceController@update');
+    Route::get('getUsers', '\App\Http\Controllers\UserController@getAllUsers');
 });
 
 // treasurer

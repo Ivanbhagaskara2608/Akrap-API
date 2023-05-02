@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class SecretaryMiddleware
+class AdminMiddleware
 {
     /**
      * Handle an incoming request.
@@ -19,17 +19,17 @@ class SecretaryMiddleware
         // check if authenticated user
         if(Auth::check()) {
             // check if user job is secretary, then can request
-            if(Auth::user()->job == 'secretary') {
+            if(Auth::user()->role == 'admin') {
                 return $next($request);
             } else {
                 return response()->json([
-                    "message" => "Access Denied as you're not Secretary"
+                    "message" => "Access Denied as you're not Admin"
                 ]);        
             }
 
         } else {
             return response()->json([
-                "message" => "Access Denied as you're not Secretary"
+                "message" => "Access Denied as you're not Admin"
             ]);
         }
 

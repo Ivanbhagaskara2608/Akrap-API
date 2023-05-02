@@ -56,16 +56,20 @@ class PresenceController extends Controller
             return response()->json([
                 'message'=>'invalid Attendance code!'
             ], 400);
-        } elseif ($schedule->status == 0) {
-            return response()->json([
-                'message'=>'This schedule is over!'
-            ], 400);
-        }
+        } 
         // get data presence 
         $presence = Presence::where('scheduleId', $schedule->scheduleId)
                             ->where('userId', $user->userId)
                             ->first();
-
+        if (!$presence) {
+            return response()->json([
+                'message'=>'You are not included in this event.'
+            ], 400);
+        } else if ($schedule->status == 0) {
+            return response()->json([
+                'message'=>'The event is over'
+            ], 400);
+        }
         // return response if user already presence
         if($presence && $presence->status == 'Hadir') {
             return response()->json([
