@@ -17,9 +17,7 @@ return new class extends Migration
             $table->foreign('scheduleId')->references('scheduleId')->on('schedules')->onDelete('cascade');
             $table->unsignedBigInteger('userId');
             $table->foreign('userId')->references('userId')->on('users')->onDelete('cascade');
-            $table->string('activity_name');
             $table->date('date');
-            $table->string('location', 16);
             $table->string('status', 5);
             $table->timestamps();
         });

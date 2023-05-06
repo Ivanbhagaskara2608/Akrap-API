@@ -101,15 +101,13 @@ class PresenceController extends Controller
             'data' => $presence
         ], 201);
     }
-    public function create($scheduleId, $activity_name, $date, $location, $users)
+    public function create($scheduleId, $date, $users)
     {
         foreach ($users as $user) {
             Presence::create([
                 'scheduleId' => $scheduleId,
                 'userId' => $user,
-                'activity_name' => $activity_name,
                 'date' => $date,
-                'location' => $location,
                 'status' => ''
             ]);
         }
@@ -120,31 +118,31 @@ class PresenceController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'scheduleId' => 'required'
-        ]);
+        // $request->validate([
+        //     'scheduleId' => 'required'
+        // ]);
 
-        // get presences data 
-        $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
+        // // get presences data 
+        // $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
 
-        if ($presences->count() == 0) {
-            return response()->json([
-                'message'=>'There is no presences!'
-            ], 400);
-        } else {
-            // check if there is data that has empty status, then set status to "Alpha"
-            foreach ($presences as $presence) {
-                if (!$presence->status) {
-                    $presence->status = 'Alpha';
-                    $presence->save();
-                }
-            }
-            // return response success
-            return response()->json([
-                'message'=> 'Attendance data has been successfully saved.',
-                'data' => $presences
-            ], 201);
-        }
+        // if ($presences->count() == 0) {
+        //     return response()->json([
+        //         'message'=>'There is no presences!'
+        //     ], 400);
+        // } else {
+        //     // check if there is data that has empty status, then set status to "Alpha"
+        //     foreach ($presences as $presence) {
+        //         if (!$presence->status) {
+        //             $presence->status = 'Alpha';
+        //             $presence->save();
+        //         }
+        //     }
+        //     // return response success
+        //     return response()->json([
+        //         'message'=> 'Attendance data has been successfully saved.',
+        //         'data' => $presences
+        //     ], 201);
+        // }
     }
 
     /**

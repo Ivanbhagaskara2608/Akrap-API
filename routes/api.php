@@ -28,7 +28,7 @@ Route::prefix('admin')->middleware(['auth:api', 'isAdmin'])->group(function() {
     Route::post('schedule/update', '\App\Http\Controllers\ScheduleController@update');
     Route::post('schedule/delete', '\App\Http\Controllers\ScheduleController@destroy');
     Route::get('presence/show', '\App\Http\Controllers\PresenceController@show');
-    Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
+    // Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
     Route::post('presence/update', '\App\Http\Controllers\PresenceController@update');
     Route::get('getUsers', '\App\Http\Controllers\UserController@getAllUsers');
 });
@@ -38,8 +38,11 @@ Route::prefix('admin')->middleware(['auth:api', 'isAdmin'])->group(function() {
 // all users authenticated
 Route::middleware(['auth:api'])->group(function() {
     Route::get('user', '\App\Http\Controllers\UserController@index');
+    Route::post('user/updateUsername', '\App\Http\Controllers\UserController@updateUsername');
+    Route::post('user/changePassword', '\App\Http\Controllers\UserController@changePassword');
     Route::get('schedule', '\App\Http\Controllers\ScheduleController@show');
     Route::get('schedule/past', '\App\Http\Controllers\ScheduleController@showPast');
+    Route::get('schedule/today', '\App\Http\Controllers\ScheduleController@todaySchedule');
     Route::post('logout', '\App\Http\Controllers\UserController@logout');
     Route::get('presence/history', '\App\Http\Controllers\PresenceController@index');
     Route::post('presence', '\App\Http\Controllers\PresenceController@presence');

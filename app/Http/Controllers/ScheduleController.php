@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Presence;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Blocktrail\CryptoJSAES\CryptoJSAES;
-
+use Illuminate\Support\Facades\Auth;
 
 class ScheduleController extends Controller
 {
@@ -54,7 +55,7 @@ class ScheduleController extends Controller
 
         
         $createPresences = new PresenceController;
-        $createPresences->create($data['scheduleId'], $data['activity_name'], $data['date'], $data['location'], $validation['users']);
+        $createPresences->create($data['scheduleId'], $data['date'], $validation['users']);
 
         // return response success
         return response()->json([
@@ -83,6 +84,16 @@ class ScheduleController extends Controller
                 'message'=>'The schedule is over!'
             ], 400);
         } else {
+            // get presences data 
+            $presences = Presence::where('scheduleId', $request['scheduleId'])->get();
+            // check if there is data that has empty status, then set status to "Alpha"
+            foreach ($presences as $presence) {
+                if (!$presence->status) {
+                    $presence->status = 'Alpha';
+                    $presence->save();
+                }
+            }
+
             $schedule->status = '0';
             $schedule->save();
 
@@ -195,18 +206,42 @@ class ScheduleController extends Controller
             'scheduleId' => 'required'
         ]);
 
-        $schedule = Schedule::where('scheduleId', $request['scheduleId'])->first();
-        
-        if (!$schedule) {
-            return response()->json([
-                'message'=>'There is no schedule!'
-            ], 400);
-        } else {
-            $schedule->forceDelete();
-
-            return response()->json([
-                'message'=> 'Schedule has been successfully deleted.',
-            ], 201);
+        foreach ($request['scheduleId'] as $schedule) {
+            $data = Schedule::where('scheduleId', $schedule)->first();
+            $data->forceDelete();
         }
+        
+        return response()->json([
+            'message'=> 'Schedule has been successfully deleted.',
+        ], 201);
+    }
+
+    public function todaySchedule()
+    {
+        // initiation auth user
+        $user = Auth::user();
+        $date = Carbon::today()->toDateString();
+
+        $data = Presence::where('date', $date)
+                ->where('userId', $user->userId)
+                ->get();
+        
+        // get all values 'scheduleId' from data
+        $scheduleIds = $data->pluck('scheduleId');
+
+        $schedules = Schedule::whereIn('scheduleId', $scheduleIds)->get();
+
+        if ($schedules->count() > 0) {
+            return response()->json([
+                "message" => "There's no schedule today",
+                'data'=> $schedules
+            ], 201);
+        } else {
+            return response()->json([
+                "message" => "Schedules are empty",
+                "data" => []
+            ], 404);
+        }
+
     }
 }

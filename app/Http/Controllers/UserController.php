@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Schedule;
 use App\Models\User;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {   
@@ -85,6 +87,51 @@ class UserController extends Controller
             "message" => "The provided credentials doesn't match our record",
             "data" => []
         ], 401);
+    }
+
+    public function updateUsername(Request $request)
+    {
+        $validation = $request->validate([
+            'username' => 'required|min:4|max:16|unique:users|alpha_dash'
+        ]);
+
+        $user = User::findOrFail(Auth::user()->userId);
+        $user->username = $validation['username'];
+        $user->save();
+
+        return response()->json([
+            "message" => "Username updated successfully",
+            "data" => $user
+        ], 200);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validation = $request->validate([
+            'currentPassword' => 'required',
+            'newPassword' => 'required|min:6|max:32|confirmed'
+        ]);
+
+        $user = User::findOrFail(Auth::user()->userId);
+
+        if(Hash::check($validation['currentPassword'], $user->password) ) {
+            $user->update(['password' => bcrypt($validation['newPassword'])]);
+            
+            // clear api_token 
+            $request->user()->forceFill([
+                'api_token' => null
+            ])->save();
+            
+            // return result
+            return response()->json([
+                "message" => "User Password has been changed",
+                "token" => null 
+            ]);
+        } else {
+            return response()->json([
+                "message" => "Old password is incorrect"
+            ], 401);
+        }
     }
 
     public function logout(Request $request)
