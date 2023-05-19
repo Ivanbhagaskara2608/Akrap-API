@@ -57,10 +57,16 @@ class ScheduleController extends Controller
         $createPresences = new PresenceController;
         $createPresences->create($data['scheduleId'], $data['date'], $validation['users']);
 
+        // Get the ID of the newly created schedule
+        $scheduleId = $data->scheduleId;
+
+        // Retrieve the newly created schedule from the database
+        $newlyCreatedSchedule = Schedule::find($scheduleId);
+
         // return response success
         return response()->json([
             "message" => "Schedule added successfully",
-            "data" => $data
+            "data" => $newlyCreatedSchedule
         ], 201);
     }
 
@@ -79,7 +85,7 @@ class ScheduleController extends Controller
             return response()->json([
                 'message'=>'There is no schedule!'
             ], 400);
-        } elseif ($schedule->status == '0') {
+        } elseif ($schedule->status == 'unavailable') {
             return response()->json([
                 'message'=>'The schedule is over!'
             ], 400);
@@ -94,7 +100,7 @@ class ScheduleController extends Controller
                 }
             }
 
-            $schedule->status = '0';
+            $schedule->status = 'unavailable';
             $schedule->save();
 
             // return response success
@@ -111,7 +117,7 @@ class ScheduleController extends Controller
     public function show()
     {
         // get and show recent schedule data
-        $schedule = Schedule::where('status', '1')->get();
+        $schedule = Schedule::where('status', 'available')->get();
 
         if($schedule->isEmpty()) {
             return response()->json([
@@ -129,7 +135,7 @@ class ScheduleController extends Controller
     public function showPast()
     {
         // get and show past schedule data
-        $schedule = Schedule::where('status', '0')->get();
+        $schedule = Schedule::where('status', "unavailable")->get();
 
         if($schedule->isEmpty()) {
             return response()->json([
@@ -172,7 +178,7 @@ class ScheduleController extends Controller
             return response()->json([
                 'message'=>'There is no schedule!'
             ], 400);
-        } elseif ($schedule->status == '0') {
+        } elseif ($schedule->status == 'unavailable') {
             return response()->json([
                 'message'=> 'You can not update the past schedule'
             ], 400);
@@ -233,7 +239,7 @@ class ScheduleController extends Controller
 
         if ($schedules->count() > 0) {
             return response()->json([
-                "message" => "There's no schedule today",
+                "message" => "Today schedule found",
                 'data'=> $schedules
             ], 201);
         } else {

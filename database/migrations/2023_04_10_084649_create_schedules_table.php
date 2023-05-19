@@ -19,7 +19,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->string('attendance_code');
-            $table->enum('status', [0, 1])->default(1);
+            $table->enum('status', ["available", "unavailable"])->default("available");
             $table->timestamps();
         });
     }

@@ -16,7 +16,8 @@ class Schedule extends Model
         'location',
         'start_time',
         'end_time',
-        'attendance_code'
+        'attendance_code',
+        'status'
     ];
 
     protected $casts = [

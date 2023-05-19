@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female']);
             $table->string('username', 16)->unique();
             $table->enum('role', ['member', 'admin'])->default('member');
-            $table->enum('status', [0, 1])->default(1);
+            $table->enum('status', ["active", "inactive"])->default("active");
             $table->string('password');
             $table->string('api_token')->unique()->nullable()->default(null);
             $table->rememberToken();

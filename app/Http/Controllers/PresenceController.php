@@ -65,7 +65,7 @@ class PresenceController extends Controller
             return response()->json([
                 'message'=>'You are not included in this event.'
             ], 400);
-        } else if ($schedule->status == 0) {
+        } else if ($schedule->status == "unavailable") {
             return response()->json([
                 'message'=>'The event is over'
             ], 400);

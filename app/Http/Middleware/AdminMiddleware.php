@@ -20,7 +20,13 @@ class AdminMiddleware
         if(Auth::check()) {
             // check if user job is secretary, then can request
             if(Auth::user()->role == 'admin') {
-                return $next($request);
+                if(Auth::user()->status == 'active') {
+                    return $next($request);
+                } else {
+                    return response()->json([
+                        "message" => "Access Denied as your account is inactive"
+                    ]); 
+                }
             } else {
                 return response()->json([
                     "message" => "Access Denied as you're not Admin"
