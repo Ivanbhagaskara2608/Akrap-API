@@ -101,13 +101,12 @@ class PresenceController extends Controller
             'data' => $presence
         ], 201);
     }
-    public function create($scheduleId, $date, $users)
+    public function create($scheduleId, $users)
     {
         foreach ($users as $user) {
             Presence::create([
                 'scheduleId' => $scheduleId,
                 'userId' => $user,
-                'date' => $date,
                 'status' => ''
             ]);
         }

@@ -13,7 +13,6 @@ class Presence extends Model
     protected $fillable = [
         'scheduleId',
         'userId',
-        'date',
         'status'
     ];
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('role', ['member', 'admin'])->default('member');
             $table->enum('status', ["active", "inactive"])->default("active");
             $table->string('password');
+            $table->string('privacyCode', 6)->nullable()->default(null);
             $table->string('api_token')->unique()->nullable()->default(null);
             $table->rememberToken();
             $table->timestamps();

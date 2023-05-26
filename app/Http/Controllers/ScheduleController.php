@@ -55,7 +55,7 @@ class ScheduleController extends Controller
 
         
         $createPresences = new PresenceController;
-        $createPresences->create($data['scheduleId'], $data['date'], $validation['users']);
+        $createPresences->create($data['scheduleId'], $validation['users']);
 
         // Get the ID of the newly created schedule
         $scheduleId = $data->scheduleId;
@@ -183,7 +183,7 @@ class ScheduleController extends Controller
                 'message'=> 'You can not update the past schedule'
             ], 400);
         } else {
-            $text = $schedule['activity_name'] . $request['date'] . $request['location'];
+            $text = $schedule['activity_name'] . $request['date'];
             $key = 'akrap hor';
             $attendanceCode = CryptoJSAES::encrypt($text, $key);
             
@@ -228,12 +228,16 @@ class ScheduleController extends Controller
         $user = Auth::user();
         $date = Carbon::today()->toDateString();
 
-        $data = Presence::where('date', $date)
-                ->where('userId', $user->userId)
-                ->get();
+        $data = Schedule::where('date', $date)->get();
         
         // get all values 'scheduleId' from data
         $scheduleIds = $data->pluck('scheduleId');
+
+        $presences = Presence::whereIn('scheduleId', $scheduleIds)
+                    ->where('userId', $user->userId)
+                    ->get();
+
+        $scheduleIds = $presences->pluck('scheduleId');
 
         $schedules = Schedule::whereIn('scheduleId', $scheduleIds)->get();
 

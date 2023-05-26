@@ -154,4 +154,74 @@ class UserController extends Controller
             "data" => $users
           ], 200);
     }
+
+    public function setPrivacyCode(Request $request)
+    {
+        $validation = $request->validate([
+            'privacyCode' => 'required|min:6|max:6|confirmed'
+        ]);
+
+        $user = User::findOrFail(Auth::user()->userId);
+
+        if($user->privacyCode == null) {
+            $user->privacyCode = $validation['privacyCode'];
+            $user->save();
+        } else {
+            return response()->json([
+                "message" => "Privacy Code already exists"
+            ], 401);
+        }
+
+        return response()->json([
+            "message" => "Successfully set Privacy Code",
+            "data" => $user->privacyCode
+        ], 200);
+    }
+
+    public function updatePrivacyCode(Request $request)
+    {
+        $validation = $request->validate([
+            'currentPrivacyCode' => 'required|min:6|max:6',
+            'newPrivacyCode' => 'required|min:6|max:6'
+        ]);
+
+        $user = User::findOrFail(Auth::user()->userId);
+
+        if($validation['currentPrivacyCode'] == $user->privacyCode) {
+            $user->update(['privacyCode' => $validation['newPrivacyCode']]);
+            
+            return response()->json([
+                "message" => "Successfully Update Privacy Code",
+                "data" => $user->privacyCode
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "Old Privacy Code is incorrect"
+            ], 401);
+        }
+    }
+
+    public function deletePrivacyCode(Request $request)
+    {
+        $validation = $request->validate([
+            'currentPrivacyCode' => 'required'
+        ]);
+
+        $user = User::findOrFail(Auth::user()->userId);
+
+        if($validation['currentPrivacyCode'] == $user->privacyCode) {
+            $user->forceFill([
+                'privacyCode' => null
+            ])->save();
+            
+            return response()->json([
+                "message" => "Successfully Delete Privacy Code",
+                "data" => $user->privacyCode
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "Old Privacy Code is incorrect"
+            ], 401);
+        }
+    }
 }
