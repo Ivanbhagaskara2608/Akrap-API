@@ -31,6 +31,9 @@ Route::prefix('admin')->middleware(['auth:api', 'isAdmin'])->group(function() {
     // Route::post('presence/store', '\App\Http\Controllers\PresenceController@store');
     Route::post('presence/update', '\App\Http\Controllers\PresenceController@update');
     Route::get('getUsers', '\App\Http\Controllers\UserController@getAllUsers');
+    Route::post('information/add', '\App\Http\Controllers\InformationController@create');
+    Route::post('information/update', '\App\Http\Controllers\InformationController@update');
+    Route::post('information/delete', '\App\Http\Controllers\InformationController@destroy');
 });
 
 
@@ -48,4 +51,7 @@ Route::middleware(['auth:api'])->group(function() {
     Route::post('logout', '\App\Http\Controllers\UserController@logout');
     Route::get('presence/history', '\App\Http\Controllers\PresenceController@index');
     Route::post('presence', '\App\Http\Controllers\PresenceController@presence');
+    Route::get('information', '\App\Http\Controllers\InformationController@index');
+    Route::get('information/latest', '\App\Http\Controllers\InformationController@latestInfo');
+    Route::post('information/markAsRead', '\App\Http\Controllers\InformationController@markAsRead');
 });

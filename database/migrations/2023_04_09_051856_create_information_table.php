@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('information', function (Blueprint $table) {
             $table->id('informationId');
-            $table->string('title');
+            $table->string('title', 100);
             $table->text('content');
+            $table->enum('category', ['Berita', 'Acara', 'Pengumuman', 'Pembaruan'])->default('Berita');
+            $table->string('image')->nullable()->default(null);
+            $table->string('attachment')->nullable()->default(null);
+            // $table->json('read_by')->nullable()->default(null);
             $table->timestamps();
         });
     }

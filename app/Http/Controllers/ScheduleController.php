@@ -39,7 +39,7 @@ class ScheduleController extends Controller
         ]);
 
         // do encryption for attendance code
-        $text = $validation['activity_name'] . $validation['date'] . $validation['location'];
+        $text = $validation['activity_name'] . $validation['date'];
         $key = 'akrap hor';
         $attendanceCode = CryptoJSAES::encrypt($text, $key);
         
